@@ -1,0 +1,52 @@
+<Project>
+
+    <PropertyGroup>
+
+        <!-- =====================================================
+             Target Framework
+             ===================================================== -->
+
+        <TargetFramework>net10.0</TargetFramework>
+
+        <!-- =====================================================
+             C# / Compiler
+             ===================================================== -->
+
+        <LangVersion>14.0</LangVersion>
+
+        <Nullable>enable</Nullable>
+
+        <!-- Lateral explicitly prohibits implicit global usings -->
+        <ImplicitUsings>disable</ImplicitUsings>
+
+        <!-- =====================================================
+             Analysis
+             ===================================================== -->
+
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+
+        <!-- Enforce .editorconfig code style during build -->
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+        <!-- Highest warning level appropriate to the language
+             version, according to the supplied standard -->
+        <WarningLevel>6</WarningLevel>
+
+        <!-- =====================================================
+             Warnings
+             ===================================================== -->
+
+        <!-- Release builds must treat warnings as errors -->
+        <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">
+            true
+        </TreatWarningsAsErrors>
+
+        <!-- =====================================================
+             Compiler behavior
+             ===================================================== -->
+
+        <DebugType>portable</DebugType>
+
+    </PropertyGroup>
+
+</Project>

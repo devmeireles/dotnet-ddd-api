@@ -1,0 +1,6 @@
+@ChefHero.API_HostAddress = http://localhost:5251
+
+GET {{ChefHero.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

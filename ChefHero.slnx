@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ChefHero.API/ChefHero.API.csproj" />
+    <Project Path="src/ChefHero.Application/ChefHero.Application.csproj" />
+    <Project Path="src/ChefHero.Domain/ChefHero.Domain.csproj" />
+    <Project Path="src/ChefHero.Infrastructure/ChefHero.Infrastructure.csproj" />
+  </Folder>
+</Solution>
