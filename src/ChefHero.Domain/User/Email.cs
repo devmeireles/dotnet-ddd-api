@@ -1,9 +1,9 @@
-using System.Net.Mail;
-
 namespace ChefHero.Domain.User;
 
-public sealed class Email : IEquatable<Email>
+public sealed class Email
 {
+    private const int MaxLength = 128;
+
     public string Value { get; }
 
     private Email(string value)
@@ -22,60 +22,44 @@ public sealed class Email : IEquatable<Email>
 
         string normalizedValue = value.Trim();
 
-        if (normalizedValue.Length > 320)
+        if (normalizedValue.Length > MaxLength)
         {
             throw new ArgumentException(
-                "Email cannot exceed 320 characters.",
+                $"Email cannot exceed {MaxLength} characters.",
                 nameof(value));
         }
 
-        if (!IsValid(normalizedValue))
+        if (!IsValidFormat(normalizedValue))
         {
             throw new ArgumentException(
-                "Email is invalid.",
+                "Email has an invalid format.",
                 nameof(value));
         }
 
         return new Email(normalizedValue);
     }
 
-    public bool Equals(Email? other)
+    private static bool IsValidFormat(string value)
     {
-        if (other is null)
+        int atIndex = value.IndexOf('@');
+
+        if (atIndex <= 0)
         {
             return false;
         }
 
-        return string.Equals(
-            Value,
-            other.Value,
-            StringComparison.OrdinalIgnoreCase);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return Equals(obj as Email);
-    }
-
-    public override int GetHashCode()
-    {
-        return StringComparer.OrdinalIgnoreCase.GetHashCode(Value);
-    }
-
-    private static bool IsValid(string value)
-    {
-        try
-        {
-            MailAddress mailAddress = new(value);
-
-            return string.Equals(
-                mailAddress.Address,
-                value,
-                StringComparison.OrdinalIgnoreCase);
-        }
-        catch (FormatException)
+        if (atIndex != value.LastIndexOf('@'))
         {
             return false;
         }
+
+        if (atIndex == value.Length - 1)
+        {
+            return false;
+        }
+
+        string domain = value[(atIndex + 1)..];
+
+        return domain.Contains('.');
     }
 }
