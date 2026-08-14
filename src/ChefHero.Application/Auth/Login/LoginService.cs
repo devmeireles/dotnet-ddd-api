@@ -21,11 +21,13 @@ public class LoginService : ILoginService
         _tokenService = tokenService;
     }
 
-    public LoginResult Login(LoginCommand command)
+    public async Task<LoginResult> LoginAsync(
+        LoginCommand command,
+        CancellationToken cancellationToken)
     {
         Email email = Email.Create(command.Email);
 
-        User? user = _userRepository.GetByEmail(email);
+        User? user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
         if (user is null ||
             !_passwordHasher.Verify(command.Password, user.PasswordHash))

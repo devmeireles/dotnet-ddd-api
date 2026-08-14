@@ -4,7 +4,7 @@ namespace ChefHero.Application.Users;
 
 public interface IUserRepository
 {
-    User? GetByEmail(Email email);
-    void Add(User user);
-    void SaveChanges();
+    Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken);
+    Task AddAsync(User user, CancellationToken cancellationToken);
+    Task SaveChangesAsync(CancellationToken cancellationToken);
 }

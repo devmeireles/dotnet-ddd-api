@@ -16,10 +16,12 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost("login")]
-    public IActionResult Login(LoginRequest request)
+    public async Task<IActionResult> LoginAsync(
+        LoginRequest request,
+        CancellationToken cancellationToken)
     {
         LoginCommand command = request.ToCommand();
-        LoginResult result = _loginService.Login(command);
+        LoginResult result = await _loginService.LoginAsync(command, cancellationToken);
         LoginResponse response = result.ToResponse();
 
         return Ok(response);

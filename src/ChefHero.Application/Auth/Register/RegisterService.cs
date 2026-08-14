@@ -2,6 +2,7 @@ using ChefHero.Application.Auth.Password;
 using ChefHero.Application.Auth.Token;
 using ChefHero.Application.Common.Exceptions;
 using ChefHero.Application.Users;
+
 using ChefHero.Domain.User;
 
 namespace ChefHero.Application.Auth.Register;
@@ -9,25 +10,33 @@ namespace ChefHero.Application.Auth.Register;
 public class RegisterService : IRegisterService
 {
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
+    private readonly IUserRepository _userRepository;
 
-    public RegisterService(IPasswordHasher passwordHasher, IUserRepository userRepository, ITokenService tokenService)
+    public RegisterService(
+        IPasswordHasher passwordHasher,
+        ITokenService tokenService,
+        IUserRepository userRepository)
     {
         _passwordHasher = passwordHasher;
-        _userRepository = userRepository;
         _tokenService = tokenService;
+        _userRepository = userRepository;
     }
 
-    public RegisterResult Register(RegisterCommand command)
+    public async Task<RegisterResult> RegisterAsync(
+        RegisterCommand command,
+        CancellationToken cancellationToken)
     {
         Email email = Email.Create(command.Email);
 
-        User? existingUser = _userRepository.GetByEmail(email);
+        User? existingUser = await _userRepository.GetByEmailAsync(
+            email,
+            cancellationToken);
 
         if (existingUser is not null)
         {
-            throw new ConflictException($"User with email '{email.Value}' already exists.");
+            throw new ConflictException(
+                $"User with email '{email.Value}' already exists.");
         }
 
         string passwordHash = _passwordHasher.Hash(command.Password);
@@ -41,17 +50,19 @@ public class RegisterService : IRegisterService
             addressLine: command.AddressLine,
             city: command.City,
             state: command.State,
-            zipCode: command.ZipCode
-        );
+            zipCode: command.ZipCode);
 
-        _userRepository.Add(user);
-        _userRepository.SaveChanges();
+        await _userRepository.AddAsync(
+            user,
+            cancellationToken);
+
+        await _userRepository.SaveChangesAsync(
+            cancellationToken);
 
         string token = _tokenService.Generate(
             user.Id,
             user.Email.Value,
-            user.Role.ToString()
-        );
+            user.Role.ToString());
 
         return new RegisterResult
         {

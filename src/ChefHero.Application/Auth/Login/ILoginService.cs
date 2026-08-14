@@ -2,5 +2,7 @@ namespace ChefHero.Application.Auth.Login;
 
 public interface ILoginService
 {
-    LoginResult Login(LoginCommand command);
+    Task<LoginResult> LoginAsync(
+        LoginCommand command,
+        CancellationToken cancellationToken);
 }

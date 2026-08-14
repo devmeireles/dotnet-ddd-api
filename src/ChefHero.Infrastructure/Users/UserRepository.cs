@@ -1,6 +1,10 @@
 using ChefHero.Application.Users;
 using ChefHero.Domain.User;
+
 using ChefHero.Infrastructure.Persistence;
+
+using Microsoft.EntityFrameworkCore;
+
 namespace ChefHero.Infrastructure.Users;
 
 public class UserRepository : IUserRepository
@@ -12,19 +16,28 @@ public class UserRepository : IUserRepository
         _dbContext = dbContext;
     }
 
-    public User? GetByEmail(Email email)
+    public async Task<User?> GetByEmailAsync(
+        Email email,
+        CancellationToken cancellationToken)
     {
-        return _dbContext.Users
-            .FirstOrDefault(user => user.Email == email);
+        return await _dbContext.Users
+            .FirstOrDefaultAsync(
+                user => user.Email.Value == email.Value,
+                cancellationToken);
     }
 
-    public void Add(User user)
+    public async Task AddAsync(
+        User user,
+        CancellationToken cancellationToken)
     {
-        _dbContext.Users.Add(user);
+        await _dbContext.Users.AddAsync(
+            user,
+            cancellationToken);
     }
 
-    public void SaveChanges()
+    public async Task SaveChangesAsync(
+        CancellationToken cancellationToken)
     {
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

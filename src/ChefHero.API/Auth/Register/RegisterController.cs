@@ -17,12 +17,18 @@ public class RegisterController : ControllerBase
     }
 
     [HttpPost("register")]
-    public IActionResult Register(RegisterRequest request)
+    public async Task<IActionResult> RegisterAsync(
+    RegisterRequest request,
+    CancellationToken cancellationToken)
     {
         RegisterCommand command = request.ToCommand();
-        RegisterResult result = _registerService.Register(command);
+
+        RegisterResult result = await _registerService.RegisterAsync(
+            command,
+            cancellationToken);
+
         RegisterResponse response = result.ToResponse();
 
-        return StatusCode(StatusCodes.Status201Created, response);
+        return Created(string.Empty, response);
     }
 }
