@@ -1,3 +1,7 @@
+using ChefHero.Domain.Common.Exceptions;
+
+using System.Net.Mail;
+
 namespace ChefHero.Domain.User;
 
 public sealed class Email
@@ -15,25 +19,22 @@ public sealed class Email
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException(
-                "Email cannot be empty.",
-                nameof(value));
+            throw new DomainValidationException(
+                "Email cannot be empty.");
         }
 
-        string normalizedValue = value.Trim();
+        string normalizedValue = value.Trim().ToLowerInvariant();
 
         if (normalizedValue.Length > MaxLength)
         {
-            throw new ArgumentException(
-                $"Email cannot exceed {MaxLength} characters.",
-                nameof(value));
+            throw new DomainValidationException(
+                $"Email cannot exceed {MaxLength} characters.");
         }
 
         if (!IsValidFormat(normalizedValue))
         {
-            throw new ArgumentException(
-                "Email has an invalid format.",
-                nameof(value));
+            throw new DomainValidationException(
+                "Email has an invalid format.");
         }
 
         return new Email(normalizedValue);
@@ -41,25 +42,18 @@ public sealed class Email
 
     private static bool IsValidFormat(string value)
     {
-        int atIndex = value.IndexOf('@');
+        try
+        {
+            MailAddress mailAddress = new(value);
 
-        if (atIndex <= 0)
+            return string.Equals(
+                mailAddress.Address,
+                value,
+                StringComparison.OrdinalIgnoreCase);
+        }
+        catch (FormatException)
         {
             return false;
         }
-
-        if (atIndex != value.LastIndexOf('@'))
-        {
-            return false;
-        }
-
-        if (atIndex == value.Length - 1)
-        {
-            return false;
-        }
-
-        string domain = value[(atIndex + 1)..];
-
-        return domain.Contains('.');
     }
 }

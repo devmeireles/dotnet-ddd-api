@@ -1,11 +1,12 @@
 using ChefHero.Application.Common.Exceptions;
+using ChefHero.Domain.Common.Exceptions;
 
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChefHero.API.Common.Exceptions;
 
-public class GlobalExceptionHandler : IExceptionHandler
+public sealed class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandler> _logger;
 
@@ -20,62 +21,67 @@ public class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (exception is ConflictException)
+        ProblemDetails? problemDetails = exception switch
         {
-            ProblemDetails problemDetails = new()
-            {
-                Status = StatusCodes.Status409Conflict,
-                Title = "Conflict",
-                Detail = exception.Message
-            };
+            DomainValidationException =>
+                CreateProblemDetails(
+                    StatusCodes.Status400BadRequest,
+                    "Validation Error",
+                    exception.Message),
 
-            httpContext.Response.StatusCode =
-                StatusCodes.Status409Conflict;
+            ConflictException =>
+                CreateProblemDetails(
+                    StatusCodes.Status409Conflict,
+                    "Conflict",
+                    exception.Message),
 
-            await httpContext.Response.WriteAsJsonAsync(
-                problemDetails,
-                cancellationToken);
+            ForbiddenException =>
+                CreateProblemDetails(
+                    StatusCodes.Status403Forbidden,
+                    "Forbidden",
+                    exception.Message),
 
-            return true;
-        }
+            UnauthorizedAccessException =>
+                CreateProblemDetails(
+                    StatusCodes.Status401Unauthorized,
+                    "Unauthorized",
+                    "Invalid email or password."),
 
-        if (exception is UnauthorizedAccessException)
-        {
-            ProblemDetails problemDetails = new()
-            {
-                Status = StatusCodes.Status401Unauthorized,
-                Title = "Unauthorized",
-                Detail = "Invalid email or password."
-            };
-
-            httpContext.Response.StatusCode =
-                StatusCodes.Status401Unauthorized;
-
-            await httpContext.Response.WriteAsJsonAsync(
-                problemDetails,
-                cancellationToken);
-
-            return true;
-        }
-
-        _logger.LogError(
-            exception,
-            "An unhandled exception occurred.");
-
-        ProblemDetails internalError = new()
-        {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal Server Error",
-            Detail = "An unexpected error occurred."
+            _ => null
         };
 
+        if (problemDetails is null)
+        {
+            _logger.LogError(
+                exception,
+                "An unhandled exception occurred.");
+
+            problemDetails = CreateProblemDetails(
+                StatusCodes.Status500InternalServerError,
+                "Internal Server Error",
+                "An unexpected error occurred.");
+        }
+
         httpContext.Response.StatusCode =
-            StatusCodes.Status500InternalServerError;
+            problemDetails.Status ?? StatusCodes.Status500InternalServerError;
 
         await httpContext.Response.WriteAsJsonAsync(
-            internalError,
+            problemDetails,
             cancellationToken);
 
         return true;
+    }
+
+    private static ProblemDetails CreateProblemDetails(
+        int status,
+        string title,
+        string detail)
+    {
+        return new ProblemDetails
+        {
+            Status = status,
+            Title = title,
+            Detail = detail
+        };
     }
 }

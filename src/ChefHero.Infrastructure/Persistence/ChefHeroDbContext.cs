@@ -6,13 +6,13 @@ namespace ChefHero.Infrastructure.Persistence;
 
 public class ChefHeroDbContext : DbContext
 {
+    public DbSet<User> Users { get; set; }
+
     public ChefHeroDbContext(
         DbContextOptions<ChefHeroDbContext> options)
         : base(options)
     {
     }
-
-    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

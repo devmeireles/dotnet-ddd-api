@@ -22,7 +22,7 @@ public class UserRepository : IUserRepository
     {
         return await _dbContext.Users
             .FirstOrDefaultAsync(
-                user => user.Email.Value == email.Value,
+                user => user.Email == email,
                 cancellationToken);
     }
 

@@ -4,6 +4,7 @@ using System.Text;
 using ChefHero.Infrastructure.Auth.Token;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ChefHero.API.Common.DependencyInjection;
@@ -27,24 +28,41 @@ public static class AuthenticationServiceExtensions
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.TokenValidationParameters =
-                    new TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
+
+                    RoleClaimType = ClaimTypes.Role,
+                    NameClaimType = ClaimTypes.NameIdentifier
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = async context =>
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+                        context.HandleResponse();
 
-                        ValidIssuer = jwtOptions.Issuer,
-                        ValidAudience = jwtOptions.Audience,
+                        context.Response.StatusCode =
+                            StatusCodes.Status401Unauthorized;
 
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(
-                                jwtOptions.SecretKey)),
-
-                        RoleClaimType = ClaimTypes.Role,
-                        NameClaimType = ClaimTypes.NameIdentifier
-                    };
+                        await context.Response.WriteAsJsonAsync(
+                            new ProblemDetails
+                            {
+                                Status = StatusCodes.Status401Unauthorized,
+                                Title = "Unauthorized",
+                                Detail = "Authentication is required."
+                            });
+                    }
+                };
             });
 
         services.AddAuthorization();
