@@ -16,17 +16,17 @@ public class BringableKitchenItemService : IBringableKitchenItemService
     }
 
     public async Task<BringableKitchenItemResult> CreateAsync(
-    BringableKitchenItemCommand command,
-    CancellationToken cancellationToken)
+        BringableKitchenItemCommand command,
+        CancellationToken cancellationToken)
     {
-        bool nameExists = await _repository.ExistsByNameAsync(
+        bool exists = await _repository.ExistsByNameAsync(
             command.Name,
             cancellationToken);
 
-        if (nameExists)
+        if (exists)
         {
             throw new ConflictException(
-                $"A kitchen item with name '{command.Name}' already exists.");
+                "A kitchen item with this name already exists.");
         }
 
         BringableKitchenItemEntity item =
@@ -58,14 +58,31 @@ public class BringableKitchenItemService : IBringableKitchenItemService
             : ToResult(item);
     }
 
-    public async Task<IEnumerable<BringableKitchenItemResult>> GetAllAsync(
-        CancellationToken cancellationToken)
+    public async Task<PagedBringableKitchenItemResult> GetAllAsync(
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken)
     {
         IEnumerable<BringableKitchenItemEntity> items =
             await _repository.GetAllAsync(
+                page,
+                pageSize,
                 cancellationToken);
 
-        return items.Select(ToResult);
+        int totalCount =
+            await _repository.GetCountAsync(
+                cancellationToken);
+
+        return new PagedBringableKitchenItemResult
+        {
+            Items = items
+                .Select(ToResult)
+                .ToList(),
+
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
     }
 
     public async Task<BringableKitchenItemResult?> UpdateAsync(
@@ -81,6 +98,16 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         if (item is null)
         {
             return null;
+        }
+
+        bool nameExists = await _repository.ExistsByNameAsync(
+            command.Name,
+            cancellationToken);
+
+        if (nameExists && item.Name != command.Name)
+        {
+            throw new ConflictException(
+                "A kitchen item with this name already exists.");
         }
 
         item.Update(
@@ -100,7 +127,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         {
             Id = item.Id,
             Name = item.Name,
-            Description = item.Description
+            Description = item.Description ?? string.Empty
         };
     }
 }

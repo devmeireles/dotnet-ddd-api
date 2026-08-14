@@ -40,11 +40,23 @@ public class BringableKitchenItemRepository
     }
 
     public async Task<IEnumerable<BringableKitchenItemEntity>> GetAllAsync(
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken)
+    {
+        return await _dbContext.BringableKitchenItems
+            .AsNoTracking()
+            .OrderBy(item => item.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetCountAsync(
         CancellationToken cancellationToken)
     {
         return await _dbContext.BringableKitchenItems
-            .Where(item => item.IsActive)
-            .ToListAsync(cancellationToken);
+            .CountAsync(cancellationToken);
     }
 
     public async Task AddAsync(

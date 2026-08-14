@@ -18,19 +18,23 @@ public class BringableKitchenItemController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(
-        CancellationToken cancellationToken)
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 20,
+    CancellationToken cancellationToken = default)
     {
-        IEnumerable<BringableKitchenItemResult> results =
-            await _bringableKitchenItemService.GetAllAsync(cancellationToken);
+        PagedBringableKitchenItemResult result =
+            await _bringableKitchenItemService.GetAllAsync(
+                page,
+                pageSize,
+                cancellationToken);
 
-        return Ok(
-            results.Select(result => result.ToResponse()));
+        return Ok(result.ToResponse());
     }
 
-    [HttpGet("{id:guid}", Name = "GetBringableKitchenItemById")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetByIdAsync(
-    Guid id,
-    CancellationToken cancellationToken)
+        Guid id,
+        CancellationToken cancellationToken)
     {
         BringableKitchenItemResult? result =
             await _bringableKitchenItemService.GetByIdAsync(
@@ -47,21 +51,21 @@ public class BringableKitchenItemController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
-    BringableKitchenItemRequest request,
-    CancellationToken cancellationToken)
+        BringableKitchenItemRequest request,
+        CancellationToken cancellationToken)
     {
-        BringableKitchenItemCommand command =
-            request.ToCommand();
-
         BringableKitchenItemResult result =
             await _bringableKitchenItemService.CreateAsync(
-                command,
+                request.ToCommand(),
                 cancellationToken);
 
-        return CreatedAtRoute(
-            "GetBringableKitchenItemById",
-            new { id = result.Id },
-            result.ToResponse());
+        BringableKitchenItemResponse response =
+            result.ToResponse();
+
+        return CreatedAtAction(
+            nameof(GetByIdAsync),
+            new { id = response.Id },
+            response);
     }
 
     [HttpPut("{id:guid}")]
@@ -70,13 +74,10 @@ public class BringableKitchenItemController : ControllerBase
         BringableKitchenItemRequest request,
         CancellationToken cancellationToken)
     {
-        BringableKitchenItemCommand command =
-            request.ToCommand();
-
         BringableKitchenItemResult? result =
             await _bringableKitchenItemService.UpdateAsync(
                 id,
-                command,
+                request.ToCommand(),
                 cancellationToken);
 
         if (result is null)

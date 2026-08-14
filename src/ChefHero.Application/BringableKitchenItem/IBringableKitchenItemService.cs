@@ -10,7 +10,9 @@ public interface IBringableKitchenItemService
         Guid id,
         CancellationToken cancellationToken);
 
-    Task<IEnumerable<BringableKitchenItemResult>> GetAllAsync(
+    Task<PagedBringableKitchenItemResult> GetAllAsync(
+        int page,
+        int pageSize,
         CancellationToken cancellationToken);
 
     Task<BringableKitchenItemResult?> UpdateAsync(
