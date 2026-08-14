@@ -85,6 +85,54 @@ namespace ChefHero.Domain.User
             );
         }
 
+        public void Activate()
+        {
+            IsActive = true;
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
+        }
+
+        public void ChangeRole(UserRole role)
+        {
+            Role = role;
+        }
+
+        public void ChangeName(string name)
+        {
+            ValidateRequired(name, nameof(name), 64);
+
+            Name = name;
+        }
+
+
+        public void ChangePhone(string phone)
+        {
+            ValidateRequired(phone, nameof(phone), 32);
+
+            Phone = phone;
+        }
+
+        public void ChangeAddress(
+            string addressLine,
+            string city,
+            string state,
+            string zipCode
+        )
+        {
+            ValidateRequired(addressLine, nameof(addressLine), 128);
+            ValidateRequired(city, nameof(city), 64);
+            ValidateRequired(state, nameof(state), 64);
+            ValidateRequired(zipCode, nameof(zipCode), 16);
+
+            AddressLine = addressLine;
+            City = city;
+            State = state;
+            ZipCode = zipCode;
+        }
+
         private static void ValidateRequired(string value, string parameterName, int maxLength)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -100,6 +148,7 @@ namespace ChefHero.Domain.User
                     $"{parameterName} cannot exceed {maxLength} characters.",
                     parameterName);
             }
+
         }
     }
 }
