@@ -93,11 +93,18 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         };
     }
 
-    public async Task<BringableKitchenItemResult?> UpdateAsync(
-        Guid id,
-        UpdateBringableKitchenItemCommand command,
-        CancellationToken cancellationToken)
+    public async Task<BringableKitchenItemResult?> PatchAsync(
+    Guid id,
+    PatchBringableKitchenItemCommand command,
+    CancellationToken cancellationToken)
     {
+        if (!command.HasName &&
+            !command.HasDescription)
+        {
+            throw new ValidationException(
+                "At least one property must be provided.");
+        }
+
         BringableKitchenItemEntity? item =
             await _repository.GetByIdAsync(
                 id,
@@ -109,18 +116,27 @@ public class BringableKitchenItemService : IBringableKitchenItemService
             return null;
         }
 
-        string name = command.Name ?? item.Name;
-        string? description = command.Description ?? item.Description;
+        string name = command.HasName
+            ? command.Name!
+            : item.Name;
 
-        bool nameExists = await _repository.ExistsByNameAsync(
-            name,
-            item.Id,
-            cancellationToken);
+        string? description = command.HasDescription
+            ? command.Description
+            : item.Description;
 
-        if (nameExists)
+        if (command.HasName)
         {
-            throw new ConflictException(
-                "A kitchen item with this name already exists.");
+            bool nameExists =
+                await _repository.ExistsByNameAsync(
+                    name,
+                    item.Id,
+                    cancellationToken);
+
+            if (nameExists)
+            {
+                throw new ConflictException(
+                    "A kitchen item with this name already exists.");
+            }
         }
 
         item.Update(

@@ -17,9 +17,9 @@ public interface IBringableKitchenItemService
         bool? isActive,
         CancellationToken cancellationToken);
 
-    Task<BringableKitchenItemResult?> UpdateAsync(
+    Task<BringableKitchenItemResult?> PatchAsync(
         Guid id,
-        UpdateBringableKitchenItemCommand command,
+        PatchBringableKitchenItemCommand command,
         CancellationToken cancellationToken);
 
     Task<bool> ActivateAsync(

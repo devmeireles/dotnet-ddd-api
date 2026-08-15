@@ -70,20 +70,16 @@ public class BringableKitchenItemController : ControllerBase
     }
 
     [HttpPatch("{id:guid}")]
-    public async Task<IActionResult> UpdateAsync(
+    public async Task<IActionResult> PatchAsync(
         Guid id,
-        UpdateBringableKitchenItemRequest request,
+        PatchBringableKitchenItemRequest request,
         CancellationToken cancellationToken)
     {
-        UpdateBringableKitchenItemCommand command =
-            new()
-            {
-                Name = request.Name,
-                Description = request.Description
-            };
+        PatchBringableKitchenItemCommand command =
+            request.ToCommand();
 
         BringableKitchenItemResult? result =
-            await _bringableKitchenItemService.UpdateAsync(
+            await _bringableKitchenItemService.PatchAsync(
                 id,
                 command,
                 cancellationToken);
@@ -96,7 +92,7 @@ public class BringableKitchenItemController : ControllerBase
         return Ok(result.ToResponse());
     }
 
-    [HttpPatch("{id:guid}/activate")]
+    [HttpPost("{id:guid}/activate")]
     public async Task<IActionResult> ActivateAsync(
         Guid id,
         CancellationToken cancellationToken)
@@ -114,7 +110,7 @@ public class BringableKitchenItemController : ControllerBase
         return NoContent();
     }
 
-    [HttpPatch("{id:guid}/deactivate")]
+    [HttpPost("{id:guid}/deactivate")]
     public async Task<IActionResult> DeactivateAsync(
         Guid id,
         CancellationToken cancellationToken)
