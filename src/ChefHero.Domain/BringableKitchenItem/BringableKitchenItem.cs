@@ -61,6 +61,16 @@ public sealed class BringableKitchenItem
         Description = description?.Trim();
     }
 
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
+
     private static void ValidateRequired(
         string value,
         string propertyName,

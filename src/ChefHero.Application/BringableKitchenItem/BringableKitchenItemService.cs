@@ -21,6 +21,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
     {
         bool exists = await _repository.ExistsByNameAsync(
             command.Name,
+            null,
             cancellationToken);
 
         if (exists)
@@ -51,6 +52,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         BringableKitchenItemEntity? item =
             await _repository.GetByIdAsync(
                 id,
+                true,
                 cancellationToken);
 
         return item is null
@@ -59,18 +61,24 @@ public class BringableKitchenItemService : IBringableKitchenItemService
     }
 
     public async Task<PagedBringableKitchenItemResult> GetAllAsync(
-    int page,
-    int pageSize,
-    CancellationToken cancellationToken)
+        int page,
+        int pageSize,
+        string? searchTerm,
+        bool? isActive,
+        CancellationToken cancellationToken)
     {
         IEnumerable<BringableKitchenItemEntity> items =
             await _repository.GetAllAsync(
                 page,
                 pageSize,
+                searchTerm,
+                isActive,
                 cancellationToken);
 
         int totalCount =
             await _repository.GetCountAsync(
+                searchTerm,
+                isActive,
                 cancellationToken);
 
         return new PagedBringableKitchenItemResult
@@ -87,12 +95,13 @@ public class BringableKitchenItemService : IBringableKitchenItemService
 
     public async Task<BringableKitchenItemResult?> UpdateAsync(
         Guid id,
-        BringableKitchenItemCommand command,
+        UpdateBringableKitchenItemCommand command,
         CancellationToken cancellationToken)
     {
         BringableKitchenItemEntity? item =
             await _repository.GetByIdAsync(
                 id,
+                true,
                 cancellationToken);
 
         if (item is null)
@@ -100,24 +109,74 @@ public class BringableKitchenItemService : IBringableKitchenItemService
             return null;
         }
 
+        string name = command.Name ?? item.Name;
+        string? description = command.Description ?? item.Description;
+
         bool nameExists = await _repository.ExistsByNameAsync(
-            command.Name,
+            name,
+            item.Id,
             cancellationToken);
 
-        if (nameExists && item.Name != command.Name)
+        if (nameExists)
         {
             throw new ConflictException(
                 "A kitchen item with this name already exists.");
         }
 
         item.Update(
-            command.Name,
-            command.Description);
+            name,
+            description);
 
         await _repository.SaveChangesAsync(
             cancellationToken);
 
         return ToResult(item);
+    }
+
+    public async Task<bool> ActivateAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        BringableKitchenItemEntity? item =
+            await _repository.GetByIdAsync(
+                id,
+                false,
+                cancellationToken);
+
+        if (item is null)
+        {
+            return false;
+        }
+
+        item.Activate();
+
+        await _repository.SaveChangesAsync(
+            cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> DeactivateAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        BringableKitchenItemEntity? item =
+            await _repository.GetByIdAsync(
+                id,
+                true,
+                cancellationToken);
+
+        if (item is null)
+        {
+            return false;
+        }
+
+        item.Deactivate();
+
+        await _repository.SaveChangesAsync(
+            cancellationToken);
+
+        return true;
     }
 
     private static BringableKitchenItemResult ToResult(

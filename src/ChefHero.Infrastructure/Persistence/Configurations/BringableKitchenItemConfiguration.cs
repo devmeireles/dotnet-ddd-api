@@ -25,6 +25,8 @@ public class BringableKitchenItemConfiguration
             .IsRequired();
 
         builder.HasIndex(item => item.Name)
-            .IsUnique();
+            .IsUnique()
+            .HasDatabaseName("IX_BringableKitchenItems_Name")
+            .HasFilter("\"IsActive\" = true");
     }
 }

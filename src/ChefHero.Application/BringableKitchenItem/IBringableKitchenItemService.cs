@@ -13,10 +13,20 @@ public interface IBringableKitchenItemService
     Task<PagedBringableKitchenItemResult> GetAllAsync(
         int page,
         int pageSize,
+        string? searchTerm,
+        bool? isActive,
         CancellationToken cancellationToken);
 
     Task<BringableKitchenItemResult?> UpdateAsync(
         Guid id,
-        BringableKitchenItemCommand command,
+        UpdateBringableKitchenItemCommand command,
+        CancellationToken cancellationToken);
+
+    Task<bool> ActivateAsync(
+        Guid id,
+        CancellationToken cancellationToken);
+
+    Task<bool> DeactivateAsync(
+        Guid id,
         CancellationToken cancellationToken);
 }

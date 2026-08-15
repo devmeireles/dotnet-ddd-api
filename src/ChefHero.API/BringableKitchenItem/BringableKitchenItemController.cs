@@ -18,20 +18,21 @@ public class BringableKitchenItemController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(
-    [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 20,
-    CancellationToken cancellationToken = default)
+        [FromQuery] GetBringableKitchenItemsRequest request,
+        CancellationToken cancellationToken = default)
     {
         PagedBringableKitchenItemResult result =
             await _bringableKitchenItemService.GetAllAsync(
-                page,
-                pageSize,
+                request.Page,
+                request.PageSize,
+                request.SearchTerm,
+                request.IsActive,
                 cancellationToken);
 
         return Ok(result.ToResponse());
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetBringableKitchenItemById")]
     public async Task<IActionResult> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken)
@@ -62,22 +63,29 @@ public class BringableKitchenItemController : ControllerBase
         BringableKitchenItemResponse response =
             result.ToResponse();
 
-        return CreatedAtAction(
-            nameof(GetByIdAsync),
+        return CreatedAtRoute(
+            "GetBringableKitchenItemById",
             new { id = response.Id },
             response);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateAsync(
         Guid id,
-        BringableKitchenItemRequest request,
+        UpdateBringableKitchenItemRequest request,
         CancellationToken cancellationToken)
     {
+        UpdateBringableKitchenItemCommand command =
+            new()
+            {
+                Name = request.Name,
+                Description = request.Description
+            };
+
         BringableKitchenItemResult? result =
             await _bringableKitchenItemService.UpdateAsync(
                 id,
-                request.ToCommand(),
+                command,
                 cancellationToken);
 
         if (result is null)
@@ -86,5 +94,41 @@ public class BringableKitchenItemController : ControllerBase
         }
 
         return Ok(result.ToResponse());
+    }
+
+    [HttpPatch("{id:guid}/activate")]
+    public async Task<IActionResult> ActivateAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        bool activated =
+            await _bringableKitchenItemService.ActivateAsync(
+                id,
+                cancellationToken);
+
+        if (!activated)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/deactivate")]
+    public async Task<IActionResult> DeactivateAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        bool deactivated =
+            await _bringableKitchenItemService.DeactivateAsync(
+                id,
+                cancellationToken);
+
+        if (!deactivated)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
     }
 }
