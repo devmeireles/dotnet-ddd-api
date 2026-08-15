@@ -10,7 +10,7 @@ public static class BringableKitchenItemMapper
         return new BringableKitchenItemCommand
         {
             Name = request.Name,
-            Description = request.Description
+            Description = request.Description ?? string.Empty
         };
     }
 
@@ -22,6 +22,24 @@ public static class BringableKitchenItemMapper
             Id = result.Id,
             Name = result.Name,
             Description = result.Description
+        };
+    }
+
+    public static PagedBringableKitchenItemResponse ToResponse(
+        this PagedBringableKitchenItemResult result)
+    {
+        return new PagedBringableKitchenItemResponse
+        {
+            Items = result.Items
+                .Select(item => item.ToResponse())
+                .ToList(),
+
+            CurrentPage = result.CurrentPage,
+            PageSize = result.PageSize,
+            TotalCount = result.TotalCount,
+            TotalPages = result.TotalPages,
+            HasPrevious = result.HasPrevious,
+            HasNext = result.HasNext
         };
     }
 }

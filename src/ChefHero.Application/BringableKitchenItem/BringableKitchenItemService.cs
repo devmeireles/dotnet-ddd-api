@@ -16,17 +16,18 @@ public class BringableKitchenItemService : IBringableKitchenItemService
     }
 
     public async Task<BringableKitchenItemResult> CreateAsync(
-    BringableKitchenItemCommand command,
-    CancellationToken cancellationToken)
+        BringableKitchenItemCommand command,
+        CancellationToken cancellationToken)
     {
-        bool nameExists = await _repository.ExistsByNameAsync(
+        bool exists = await _repository.ExistsByNameAsync(
             command.Name,
+            null,
             cancellationToken);
 
-        if (nameExists)
+        if (exists)
         {
             throw new ConflictException(
-                $"A kitchen item with name '{command.Name}' already exists.");
+                "A kitchen item with this name already exists.");
         }
 
         BringableKitchenItemEntity item =
@@ -51,6 +52,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         BringableKitchenItemEntity? item =
             await _repository.GetByIdAsync(
                 id,
+                true,
                 cancellationToken);
 
         return item is null
@@ -58,24 +60,55 @@ public class BringableKitchenItemService : IBringableKitchenItemService
             : ToResult(item);
     }
 
-    public async Task<IEnumerable<BringableKitchenItemResult>> GetAllAsync(
+    public async Task<PagedBringableKitchenItemResult> GetAllAsync(
+        int page,
+        int pageSize,
+        string? searchTerm,
+        bool? isActive,
         CancellationToken cancellationToken)
     {
         IEnumerable<BringableKitchenItemEntity> items =
             await _repository.GetAllAsync(
+                page,
+                pageSize,
+                searchTerm,
+                isActive,
                 cancellationToken);
 
-        return items.Select(ToResult);
+        int totalCount =
+            await _repository.GetCountAsync(
+                searchTerm,
+                isActive,
+                cancellationToken);
+
+        return new PagedBringableKitchenItemResult
+        {
+            Items = items
+                .Select(ToResult)
+                .ToList(),
+
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
     }
 
-    public async Task<BringableKitchenItemResult?> UpdateAsync(
-        Guid id,
-        BringableKitchenItemCommand command,
-        CancellationToken cancellationToken)
+    public async Task<BringableKitchenItemResult?> PatchAsync(
+    Guid id,
+    PatchBringableKitchenItemCommand command,
+    CancellationToken cancellationToken)
     {
+        if (!command.HasName &&
+            !command.HasDescription)
+        {
+            throw new ValidationException(
+                "At least one property must be provided.");
+        }
+
         BringableKitchenItemEntity? item =
             await _repository.GetByIdAsync(
                 id,
+                true,
                 cancellationToken);
 
         if (item is null)
@@ -83,14 +116,83 @@ public class BringableKitchenItemService : IBringableKitchenItemService
             return null;
         }
 
+        string name = command.HasName
+            ? command.Name!
+            : item.Name;
+
+        string? description = command.HasDescription
+            ? command.Description
+            : item.Description;
+
+        if (command.HasName)
+        {
+            bool nameExists =
+                await _repository.ExistsByNameAsync(
+                    name,
+                    item.Id,
+                    cancellationToken);
+
+            if (nameExists)
+            {
+                throw new ConflictException(
+                    "A kitchen item with this name already exists.");
+            }
+        }
+
         item.Update(
-            command.Name,
-            command.Description);
+            name,
+            description);
 
         await _repository.SaveChangesAsync(
             cancellationToken);
 
         return ToResult(item);
+    }
+
+    public async Task<bool> ActivateAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        BringableKitchenItemEntity? item =
+            await _repository.GetByIdAsync(
+                id,
+                false,
+                cancellationToken);
+
+        if (item is null)
+        {
+            return false;
+        }
+
+        item.Activate();
+
+        await _repository.SaveChangesAsync(
+            cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> DeactivateAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        BringableKitchenItemEntity? item =
+            await _repository.GetByIdAsync(
+                id,
+                true,
+                cancellationToken);
+
+        if (item is null)
+        {
+            return false;
+        }
+
+        item.Deactivate();
+
+        await _repository.SaveChangesAsync(
+            cancellationToken);
+
+        return true;
     }
 
     private static BringableKitchenItemResult ToResult(
@@ -100,7 +202,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         {
             Id = item.Id,
             Name = item.Name,
-            Description = item.Description
+            Description = item.Description ?? string.Empty
         };
     }
 }

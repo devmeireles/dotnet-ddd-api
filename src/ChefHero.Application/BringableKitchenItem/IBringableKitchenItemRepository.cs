@@ -5,15 +5,21 @@ namespace ChefHero.Application.BringableKitchenItem;
 
 public interface IBringableKitchenItemRepository
 {
-    Task<bool> ExistsByNameAsync(
-        string name,
-        CancellationToken cancellationToken);
-
     Task<BringableKitchenItemEntity?> GetByIdAsync(
         Guid id,
+        bool? isActive,
         CancellationToken cancellationToken);
 
     Task<IEnumerable<BringableKitchenItemEntity>> GetAllAsync(
+        int page,
+        int pageSize,
+        string? searchTerm,
+        bool? isActive,
+        CancellationToken cancellationToken);
+
+    Task<int> GetCountAsync(
+        string? searchTerm,
+        bool? isActive,
         CancellationToken cancellationToken);
 
     Task AddAsync(
@@ -21,5 +27,10 @@ public interface IBringableKitchenItemRepository
         CancellationToken cancellationToken);
 
     Task SaveChangesAsync(
+        CancellationToken cancellationToken);
+
+    Task<bool> ExistsByNameAsync(
+        string name,
+        Guid? excludeId,
         CancellationToken cancellationToken);
 }

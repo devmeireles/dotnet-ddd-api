@@ -10,11 +10,23 @@ public interface IBringableKitchenItemService
         Guid id,
         CancellationToken cancellationToken);
 
-    Task<IEnumerable<BringableKitchenItemResult>> GetAllAsync(
+    Task<PagedBringableKitchenItemResult> GetAllAsync(
+        int page,
+        int pageSize,
+        string? searchTerm,
+        bool? isActive,
         CancellationToken cancellationToken);
 
-    Task<BringableKitchenItemResult?> UpdateAsync(
+    Task<BringableKitchenItemResult?> PatchAsync(
         Guid id,
-        BringableKitchenItemCommand command,
+        PatchBringableKitchenItemCommand command,
+        CancellationToken cancellationToken);
+
+    Task<bool> ActivateAsync(
+        Guid id,
+        CancellationToken cancellationToken);
+
+    Task<bool> DeactivateAsync(
+        Guid id,
         CancellationToken cancellationToken);
 }
