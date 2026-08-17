@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChefHero.API.Auth.Register;
+namespace ChefHero.API.Auth.Register.Request;
 
 public class RegisterRequest
 {

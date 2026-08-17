@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChefHero.API.BringableKitchenItem;
+namespace ChefHero.API.BringableKitchenItem.Request;
 
 public class GetBringableKitchenItemsRequest
 {

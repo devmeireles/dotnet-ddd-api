@@ -1,6 +1,8 @@
+using ChefHero.API.Auth.Register.Request;
+using ChefHero.API.Auth.Register.Response;
 using ChefHero.Application.Auth.Register;
 
-namespace ChefHero.API.Auth.Register;
+namespace ChefHero.API.Auth.Register.Mapper;
 
 public static class RegisterMapper
 {

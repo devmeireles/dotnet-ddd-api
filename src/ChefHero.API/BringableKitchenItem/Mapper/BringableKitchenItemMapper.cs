@@ -1,6 +1,8 @@
+using ChefHero.API.BringableKitchenItem.Request;
+using ChefHero.API.BringableKitchenItem.Response;
 using ChefHero.Application.BringableKitchenItem;
 
-namespace ChefHero.API.BringableKitchenItem;
+namespace ChefHero.API.BringableKitchenItem.Mapper;
 
 public static class BringableKitchenItemMapper
 {

@@ -1,4 +1,4 @@
-namespace ChefHero.API.Auth.Login;
+namespace ChefHero.API.Auth.Login.Response;
 
 public class LoginResponse
 {

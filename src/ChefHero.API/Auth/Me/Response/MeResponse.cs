@@ -1,4 +1,4 @@
-namespace ChefHero.API.Auth.Me;
+namespace ChefHero.API.Auth.Me.Mapper;
 
 public class MeResponse
 {
