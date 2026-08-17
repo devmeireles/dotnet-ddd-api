@@ -1,4 +1,4 @@
-namespace ChefHero.API.BringableKitchenItem;
+namespace ChefHero.API.BringableKitchenItem.Response;
 
 public class BringableKitchenItemResponse
 {

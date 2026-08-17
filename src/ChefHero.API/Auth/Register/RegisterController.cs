@@ -1,7 +1,10 @@
+
+using ChefHero.API.Auth.Register.Request;
+using ChefHero.API.Auth.Register.Response;
+using ChefHero.API.Auth.Register.Mapper;
 using ChefHero.Application.Auth.Register;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ChefHero.API.Auth.Register;
 

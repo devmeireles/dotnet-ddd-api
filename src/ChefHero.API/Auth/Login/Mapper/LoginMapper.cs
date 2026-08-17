@@ -1,6 +1,8 @@
+using ChefHero.API.Auth.Login.Request;
+using ChefHero.API.Auth.Login.Response;
 using ChefHero.Application.Auth.Login;
 
-namespace ChefHero.API.Auth.Login;
+namespace ChefHero.API.Auth.Login.Mapper;
 
 public static class LoginMapper
 {

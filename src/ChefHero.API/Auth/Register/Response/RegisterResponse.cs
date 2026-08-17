@@ -1,4 +1,4 @@
-namespace ChefHero.API.Auth.Register;
+namespace ChefHero.API.Auth.Register.Response;
 
 public class RegisterResponse
 {

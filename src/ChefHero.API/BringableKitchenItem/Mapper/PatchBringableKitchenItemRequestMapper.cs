@@ -1,8 +1,9 @@
+using ChefHero.API.BringableKitchenItem.Request;
 using ChefHero.Application.BringableKitchenItem;
 
-namespace ChefHero.API.BringableKitchenItem;
+namespace ChefHero.API.BringableKitchenItem.Mapper;
 
-public static class PatchBringableKitchenItemRequestMappings
+public static class PatchBringableKitchenItemRequestMapper
 {
     public static PatchBringableKitchenItemCommand ToCommand(
         this PatchBringableKitchenItemRequest request)

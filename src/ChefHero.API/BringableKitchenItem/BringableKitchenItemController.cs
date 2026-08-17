@@ -1,3 +1,6 @@
+using ChefHero.API.BringableKitchenItem.Mapper;
+using ChefHero.API.BringableKitchenItem.Request;
+using ChefHero.API.BringableKitchenItem.Response;
 using ChefHero.Application.BringableKitchenItem;
 
 using Microsoft.AspNetCore.Mvc;

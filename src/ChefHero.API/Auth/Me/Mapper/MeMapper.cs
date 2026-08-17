@@ -1,6 +1,6 @@
 using ChefHero.Application.Auth.Me;
 
-namespace ChefHero.API.Auth.Me;
+namespace ChefHero.API.Auth.Me.Mapper;
 
 public static class MeMapper
 {

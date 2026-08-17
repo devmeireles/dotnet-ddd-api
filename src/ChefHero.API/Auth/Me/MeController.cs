@@ -1,5 +1,5 @@
+using ChefHero.API.Auth.Me.Mapper;
 using ChefHero.Application.Auth.Me;
-using ChefHero.Application.Common.Security;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 using ChefHero.Application.BringableKitchenItem;
 
-namespace ChefHero.API.BringableKitchenItem;
+namespace ChefHero.API.BringableKitchenItem.Request;
 
 public class PatchBringableKitchenItemRequest
 {

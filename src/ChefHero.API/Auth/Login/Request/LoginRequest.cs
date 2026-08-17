@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ChefHero.API.Auth.Login;
+namespace ChefHero.API.Auth.Login.Request;
 
 public class LoginRequest
 {
