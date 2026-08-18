@@ -1,3 +1,5 @@
+using ChefHero.Application.Common.Pagination;
+
 namespace ChefHero.Application.BringableKitchenItem;
 
 public interface IBringableKitchenItemService
@@ -10,7 +12,7 @@ public interface IBringableKitchenItemService
         Guid id,
         CancellationToken cancellationToken);
 
-    Task<PagedBringableKitchenItemResult> GetAllAsync(
+    Task<PagedResult<BringableKitchenItemResult>> GetAllAsync(
         int page,
         int pageSize,
         string? searchTerm,

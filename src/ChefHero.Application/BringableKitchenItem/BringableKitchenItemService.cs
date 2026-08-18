@@ -1,4 +1,5 @@
 using ChefHero.Application.Common.Exceptions;
+using ChefHero.Application.Common.Pagination;
 
 using BringableKitchenItemEntity =
     ChefHero.Domain.BringableKitchenItem.BringableKitchenItem;
@@ -60,7 +61,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
             : ToResult(item);
     }
 
-    public async Task<PagedBringableKitchenItemResult> GetAllAsync(
+    public async Task<PagedResult<BringableKitchenItemResult>> GetAllAsync(
         int page,
         int pageSize,
         string? searchTerm,
@@ -81,7 +82,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
                 isActive,
                 cancellationToken);
 
-        return new PagedBringableKitchenItemResult
+        return new PagedResult<BringableKitchenItemResult>
         {
             Items = items
                 .Select(ToResult)

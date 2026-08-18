@@ -1,6 +1,7 @@
 using ChefHero.API.BringableKitchenItem.Request;
 using ChefHero.API.BringableKitchenItem.Response;
 using ChefHero.Application.BringableKitchenItem;
+using ChefHero.Application.Common.Pagination;
 
 namespace ChefHero.API.BringableKitchenItem.Mapper;
 
@@ -28,7 +29,7 @@ public static class BringableKitchenItemMapper
     }
 
     public static PagedBringableKitchenItemResponse ToResponse(
-        this PagedBringableKitchenItemResult result)
+        this PagedResult<BringableKitchenItemResult> result)
     {
         return new PagedBringableKitchenItemResponse
         {

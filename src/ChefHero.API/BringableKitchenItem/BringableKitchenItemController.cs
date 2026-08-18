@@ -2,6 +2,7 @@ using ChefHero.API.BringableKitchenItem.Mapper;
 using ChefHero.API.BringableKitchenItem.Request;
 using ChefHero.API.BringableKitchenItem.Response;
 using ChefHero.Application.BringableKitchenItem;
+using ChefHero.Application.Common.Pagination;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,7 @@ public class BringableKitchenItemController : ControllerBase
         [FromQuery] GetBringableKitchenItemsRequest request,
         CancellationToken cancellationToken = default)
     {
-        PagedBringableKitchenItemResult result =
+        PagedResult<BringableKitchenItemResult> result =
             await _bringableKitchenItemService.GetAllAsync(
                 request.Page,
                 request.PageSize,
