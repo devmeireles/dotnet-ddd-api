@@ -43,9 +43,44 @@ namespace ChefHero.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("IX_BringableKitchenItems_Name")
+                        .HasFilter("\"IsActive\" = true");
 
                     b.ToTable("BringableKitchenItems");
+                });
+
+            modelBuilder.Entity("ChefHero.Domain.Menu.Menu", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaxPeople")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinPeople")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Menus", (string)null);
                 });
 
             modelBuilder.Entity("ChefHero.Domain.User.User", b =>

@@ -4,10 +4,12 @@ using ChefHero.API.BringableKitchenItem.Response;
 using ChefHero.Application.BringableKitchenItem;
 using ChefHero.Application.Common.Pagination;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChefHero.API.BringableKitchenItem;
 
+[Authorize]
 [ApiController]
 [Route("bringable-kitchen-items")]
 public class BringableKitchenItemController : ControllerBase

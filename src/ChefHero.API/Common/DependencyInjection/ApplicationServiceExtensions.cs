@@ -2,6 +2,7 @@ using ChefHero.Application.Auth.Register;
 using ChefHero.Application.Auth.Login;
 using ChefHero.Application.Auth.Me;
 using ChefHero.Application.BringableKitchenItem;
+using ChefHero.Application.Menu;
 
 namespace ChefHero.API.Common.DependencyInjection;
 
@@ -14,6 +15,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IMeService, MeService>();
 
         services.AddScoped<IBringableKitchenItemService, BringableKitchenItemService>();
+        services.AddScoped<IMenuService, MenuService>();
 
         return services;
     }

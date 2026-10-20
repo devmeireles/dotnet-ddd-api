@@ -1,16 +1,8 @@
-using System.ComponentModel.DataAnnotations;
+using ChefHero.API.Common.Requests;
 
 namespace ChefHero.API.BringableKitchenItem.Request;
 
-public class GetBringableKitchenItemsRequest
+public class GetBringableKitchenItemsRequest : PagedSearchRequest
 {
-    [Range(1, int.MaxValue)]
-    public int Page { get; set; } = 1;
-
-    [Range(1, 100)]
-    public int PageSize { get; set; } = 20;
-
-    public string? SearchTerm { get; set; }
-
     public bool? IsActive { get; set; } = true;
 }
