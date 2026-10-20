@@ -1,0 +1,11 @@
+<span class="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+    @MinPeople–@MaxPeople pessoas
+</span>
+
+@code {
+    [Parameter, EditorRequired]
+    public required int MinPeople { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int MaxPeople { get; set; }
+}

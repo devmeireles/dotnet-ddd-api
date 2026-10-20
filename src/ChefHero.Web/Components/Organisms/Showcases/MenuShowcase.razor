@@ -1,0 +1,58 @@
+<section aria-labelledby="menus-heading">
+    <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">ChefHero</p>
+            <h1 id="menus-heading" class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+                Menus para compartilhar
+            </h1>
+            <p class="mt-3 max-w-2xl text-muted-foreground">
+                Escolha uma experiência preparada por chefs para reunir todo mundo à mesa.
+            </p>
+        </div>
+        <span class="text-sm text-muted-foreground">@Menus.Count opções</span>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        @foreach (MenuSummary menu in Menus)
+        {
+            <MenuCard @key="menu.Name"
+                      Name="@menu.Name"
+                      Description="@menu.Description"
+                      MinPeople="@menu.MinPeople"
+                      MaxPeople="@menu.MaxPeople"
+                      Price="@menu.Price"
+                      OnOrder="() => SelectMenuAsync(menu.Name)" />
+        }
+    </div>
+
+    @if (SelectedMenu is not null)
+    {
+        <p class="mt-6 rounded-lg border border-border bg-card px-4 py-3 text-sm" role="status">
+            Você selecionou: <strong>@SelectedMenu</strong>
+        </p>
+    }
+</section>
+
+@code {
+    private static readonly IReadOnlyList<MenuSummary> Menus =
+    [
+        new("Almoço de domingo", "Pratos reconfortantes com ingredientes da estação.", 4, 8, 189.90m),
+        new("Jantar italiano", "Massas artesanais, molhos frescos e sobremesa.", 2, 6, 229.90m),
+        new("Brunch no jardim", "Uma seleção leve para manhãs sem pressa.", 4, 10, 149.90m)
+    ];
+
+    private string? SelectedMenu { get; set; }
+
+    private Task SelectMenuAsync(string menuName)
+    {
+        SelectedMenu = menuName;
+        return Task.CompletedTask;
+    }
+
+    private sealed record MenuSummary(
+        string Name,
+        string Description,
+        int MinPeople,
+        int MaxPeople,
+        decimal Price);
+}

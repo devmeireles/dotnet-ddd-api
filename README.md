@@ -3,8 +3,10 @@
 ## Requirements
 
 - .NET SDK 10.0.302 (or a later .NET 10 feature band)
+- Node.js and npm
 - Docker Compose
 - Entity Framework Core CLI (`dotnet-ef` 10.x) for database migrations
+- Tailwind CSS v4 and the ShadcnBlazor package are configured in `src/ChefHero.Web`
 
 ## Build
 
@@ -33,25 +35,32 @@ dotnet build ChefHero.slnx
    dotnet user-secrets set "Jwt:SecretKey" "replace-with-a-long-random-local-secret" --project src/ChefHero.API
    ```
 
-3. Start PostgreSQL:
+3. Install the front-end development dependencies:
 
    ```sh
-   docker compose up -d postgres
+   npm install --prefix src/ChefHero.Web
    ```
 
-4. Apply database migrations and run the API:
+4. Start PostgreSQL and apply migrations:
 
    ```sh
-   dotnet ef database update --project src/ChefHero.Infrastructure --startup-project src/ChefHero.API
-   dotnet run --project src/ChefHero.API --launch-profile http
+   npm --prefix src/ChefHero.Web run dev:setup
    ```
 
-The API runs at `http://localhost:5251`. In Development, OpenAPI and Scalar are available at `/openapi/v1.json` and `/scalar`.
+5. Run the API, Blazor front end, and Tailwind watcher together in one terminal:
 
-For development with automatic restart on code changes, run:
+   ```sh
+   npm --prefix src/ChefHero.Web run dev
+   ```
+
+The front end runs at `http://localhost:5114`; the API runs at `http://localhost:5251`. In Development, OpenAPI and Scalar are available from the API at `/openapi/v1.json` and `/scalar`. `dotnet watch` reloads the API and Blazor app on code changes; Tailwind rebuilds its stylesheet when Razor or CSS sources change. Press Ctrl+C to stop all three processes.
+
+The front end is organized using atomic-design layers: `Components/Atoms`, `Components/Molecules`, and `Components/Organisms/Showcases`. `Pages` compose the domain-specific showcase components; the home page uses `MenuShowcase`, which renders reusable `MenuCard` components and a ShadcnBlazor `Button`.
+
+Rebuild the Tailwind stylesheet without starting the watchers:
 
 ```sh
-dotnet watch --project src/ChefHero.API run --launch-profile http
+npm --prefix src/ChefHero.Web run build:css
 ```
 
 Stop the database container when finished:

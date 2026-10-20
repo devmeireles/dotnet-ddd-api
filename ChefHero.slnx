@@ -4,5 +4,6 @@
     <Project Path="src/ChefHero.Application/ChefHero.Application.csproj" />
     <Project Path="src/ChefHero.Domain/ChefHero.Domain.csproj" />
     <Project Path="src/ChefHero.Infrastructure/ChefHero.Infrastructure.csproj" />
+    <Project Path="src/ChefHero.Web/ChefHero.Web.csproj" />
   </Folder>
 </Solution>
