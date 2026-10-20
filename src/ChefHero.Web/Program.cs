@@ -1,29 +1,29 @@
 using ChefHero.Web.Components;
-
-using ShadcnBlazor;
+using ChefHero.Web.Common.DependencyInjection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-builder.Services.AddShadcnBlazor();
+builder.Services.AddWebComponents();
+builder.Services.AddWebAuthentication(builder.Configuration, builder.Environment);
+builder.Services.AddWebPersistence(builder.Configuration);
+builder.Services.AddUserSession();
+builder.Services.AddChefHeroApiClients(builder.Configuration, builder.Environment);
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
-
 app.MapStaticAssets();
+app.MapWebAuthenticationEndpoints();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
