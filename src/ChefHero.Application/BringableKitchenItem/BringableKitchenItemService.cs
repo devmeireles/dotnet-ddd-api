@@ -1,4 +1,6 @@
 using ChefHero.Application.Common.Exceptions;
+using ChefHero.Application.Common.Pagination;
+using ChefHero.Application.BringableKitchenItem.Mapper;
 
 using BringableKitchenItemEntity =
     ChefHero.Domain.BringableKitchenItem.BringableKitchenItem;
@@ -42,7 +44,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         await _repository.SaveChangesAsync(
             cancellationToken);
 
-        return ToResult(item);
+        return item.ToResult();
     }
 
     public async Task<BringableKitchenItemResult?> GetByIdAsync(
@@ -57,10 +59,10 @@ public class BringableKitchenItemService : IBringableKitchenItemService
 
         return item is null
             ? null
-            : ToResult(item);
+            : item.ToResult();
     }
 
-    public async Task<PagedBringableKitchenItemResult> GetAllAsync(
+    public async Task<PagedResult<BringableKitchenItemResult>> GetAllAsync(
         int page,
         int pageSize,
         string? searchTerm,
@@ -81,10 +83,10 @@ public class BringableKitchenItemService : IBringableKitchenItemService
                 isActive,
                 cancellationToken);
 
-        return new PagedBringableKitchenItemResult
+        return new PagedResult<BringableKitchenItemResult>
         {
             Items = items
-                .Select(ToResult)
+                .Select(item => item.ToResult())
                 .ToList(),
 
             CurrentPage = page,
@@ -146,7 +148,7 @@ public class BringableKitchenItemService : IBringableKitchenItemService
         await _repository.SaveChangesAsync(
             cancellationToken);
 
-        return ToResult(item);
+        return item.ToResult();
     }
 
     public async Task<bool> ActivateAsync(
@@ -193,16 +195,5 @@ public class BringableKitchenItemService : IBringableKitchenItemService
             cancellationToken);
 
         return true;
-    }
-
-    private static BringableKitchenItemResult ToResult(
-        BringableKitchenItemEntity item)
-    {
-        return new BringableKitchenItemResult
-        {
-            Id = item.Id,
-            Name = item.Name,
-            Description = item.Description ?? string.Empty
-        };
     }
 }

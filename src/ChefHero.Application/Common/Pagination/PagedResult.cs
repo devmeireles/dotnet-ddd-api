@@ -1,8 +1,8 @@
-namespace ChefHero.Application.BringableKitchenItem;
+namespace ChefHero.Application.Common.Pagination;
 
-public class PagedBringableKitchenItemResult
+public class PagedResult<T>
 {
-    public required IReadOnlyCollection<BringableKitchenItemResult> Items { get; init; }
+    public required IReadOnlyCollection<T> Items { get; init; }
 
     public required int CurrentPage { get; init; }
 

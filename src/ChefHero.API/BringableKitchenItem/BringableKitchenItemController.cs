@@ -2,11 +2,14 @@ using ChefHero.API.BringableKitchenItem.Mapper;
 using ChefHero.API.BringableKitchenItem.Request;
 using ChefHero.API.BringableKitchenItem.Response;
 using ChefHero.Application.BringableKitchenItem;
+using ChefHero.Application.Common.Pagination;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChefHero.API.BringableKitchenItem;
 
+[Authorize]
 [ApiController]
 [Route("bringable-kitchen-items")]
 public class BringableKitchenItemController : ControllerBase
@@ -24,7 +27,7 @@ public class BringableKitchenItemController : ControllerBase
         [FromQuery] GetBringableKitchenItemsRequest request,
         CancellationToken cancellationToken = default)
     {
-        PagedBringableKitchenItemResult result =
+        PagedResult<BringableKitchenItemResult> result =
             await _bringableKitchenItemService.GetAllAsync(
                 request.Page,
                 request.PageSize,

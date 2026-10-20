@@ -35,6 +35,12 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                     "Conflict",
                     exception.Message),
 
+            ChefHero.Application.Common.Exceptions.ValidationException =>
+                CreateProblemDetails(
+                    StatusCodes.Status400BadRequest,
+                    "Validation Error",
+                    exception.Message),
+
             ForbiddenException =>
                 CreateProblemDetails(
                     StatusCodes.Status403Forbidden,
