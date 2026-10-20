@@ -1,0 +1,39 @@
+<article class="flex h-full flex-col rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm">
+    <div class="mb-4 flex items-start justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-semibold tracking-tight">@Name</h2>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">@Description</p>
+        </div>
+        <PeopleRangeBadge MinPeople="@MinPeople" MaxPeople="@MaxPeople" />
+    </div>
+
+    <div class="mt-auto flex items-center justify-between gap-4 pt-6">
+        <p class="text-lg font-semibold">@Price.ToString("C")</p>
+        <Button Variant="ButtonVariant.Outline" @onclick="HandleOrderAsync">
+            Ver menu
+        </Button>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public required string Name { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string Description { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int MinPeople { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int MaxPeople { get; set; }
+
+    [Parameter, EditorRequired]
+    public required decimal Price { get; set; }
+
+    [Parameter]
+    public EventCallback OnOrder { get; set; }
+
+    private Task HandleOrderAsync(MouseEventArgs _) =>
+        OnOrder.InvokeAsync();
+}

@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "../bin/ShadcnBlazor/default-theme.css";
+
+@source "../**/*.razor";
+@source "../bin/ShadcnBlazor";
+
+@layer base {
+    body {
+        @apply bg-background text-foreground antialiased;
+    }
+}
