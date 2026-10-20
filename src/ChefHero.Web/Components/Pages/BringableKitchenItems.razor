@@ -1,0 +1,111 @@
+@page "/bringable-kitchen-items"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using System.Net
+@using ChefHero.Web.Application.Authentication
+@using ChefHero.Web.Infrastructure.Api.BringableKitchenItems
+@inject BringableKitchenItemApiClient Api
+@inject ICurrentUserSession UserSession
+
+<PageTitle>Bringable kitchen items</PageTitle>
+
+<h1>Bringable kitchen items</h1>
+
+@if (_authenticated)
+{
+    <form method="post" action="/account/logout">
+        <AntiforgeryToken />
+        <button type="submit">Sign out</button>
+    </form>
+}
+
+@if (_loading)
+{
+    <p role="status">Loading items…</p>
+}
+else if (_error is not null)
+{
+    <p role="alert">@_error</p>
+    <a href="/login">Sign in</a>
+    <button @onclick="() => LoadPageAsync(_currentPage)">Retry</button>
+}
+else if (_result is null || _result.Items.Count == 0)
+{
+    <p>No items found.</p>
+}
+else
+{
+    <ul>
+        @foreach (BringableKitchenItemResponse item in _result.Items)
+        {
+            <li @key="item.Id">
+                <strong>@item.Name</strong>
+                @if (!string.IsNullOrWhiteSpace(item.Description))
+                {
+                    <span> — @item.Description</span>
+                }
+            </li>
+        }
+    </ul>
+
+    <p>Page @_result.CurrentPage of @_result.TotalPages</p>
+
+    <button disabled="@(!_result.HasPrevious)" @onclick="() => LoadPageAsync(_currentPage - 1)">
+        Previous
+    </button>
+
+    <button disabled="@(!_result.HasNext)" @onclick="() => LoadPageAsync(_currentPage + 1)">
+        Next
+    </button>
+}
+
+@code {
+    private const int PageSize = 20;
+
+    private PagedBringableKitchenItemsResponse? _result;
+    private int _currentPage = 1;
+    private bool _loading = true;
+    private bool _authenticated;
+    private string? _error;
+
+    protected override Task OnInitializedAsync() => LoadPageAsync(1);
+
+    private async Task LoadPageAsync(int page)
+    {
+        _loading = true;
+        _error = null;
+
+        try
+        {
+            string? token = await UserSession.GetAccessTokenAsync();
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _error = "Sign in to view bringable kitchen items.";
+                return;
+            }
+
+            _authenticated = true;
+            _result = await Api.GetAllAsync(
+                page: page,
+                pageSize: PageSize,
+                searchTerm: null,
+                isActive: true,
+                bearerToken: token);
+
+            _currentPage = page;
+        }
+        catch (HttpRequestException exception)
+            when (exception.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _error = "Your session has expired. Please sign in again.";
+        }
+        catch (HttpRequestException)
+        {
+            _error = "Items could not be loaded. Please try again.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

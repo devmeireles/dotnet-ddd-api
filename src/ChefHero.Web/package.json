@@ -7,7 +7,7 @@
     "dev": "npm run dev:prepare && concurrently --kill-others --names API,Web,Tailwind --prefix-colors blue,green,magenta \"npm:dev:api\" \"npm:dev:web\" \"npm:dev:css\"",
     "dev:prepare": "dotnet build",
     "dev:api": "dotnet watch --project ../ChefHero.API/ChefHero.API.csproj run --launch-profile http",
-    "dev:web": "dotnet watch run --launch-profile http",
+    "dev:web": "dotnet watch run --launch-profile https",
     "dev:css": "npx @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/css/app.css --watch",
     "dev:setup": "docker compose --env-file ../../.env -f ../../docker-compose.yml up -d postgres && dotnet ef database update --project ../ChefHero.Infrastructure --startup-project ../ChefHero.API",
     "build:css": "npx @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/css/app.css"

@@ -35,16 +35,23 @@ dotnet build ChefHero.slnx
    dotnet user-secrets set "Jwt:SecretKey" "replace-with-a-long-random-local-secret" --project src/ChefHero.API
    ```
 
+   Configure the web app with its own connection string for the PostgreSQL-backed login session store:
+
+   ```sh
+   dotnet user-secrets set "ConnectionStrings:ChefHero" "Host=localhost;Port=5432;Database=chefhero;Username=chefhero;Password=<your-local-password>" --project src/ChefHero.Web
+   ```
+
 3. Install the front-end development dependencies:
 
    ```sh
    npm install --prefix src/ChefHero.Web
    ```
 
-4. Start PostgreSQL and apply migrations:
+4. Start PostgreSQL and apply API and web session migrations:
 
    ```sh
    npm --prefix src/ChefHero.Web run dev:setup
+   dotnet ef database update --project src/ChefHero.Web --startup-project src/ChefHero.Web --context WebSessionDbContext
    ```
 
 5. Run the API, Blazor front end, and Tailwind watcher together in one terminal:
@@ -53,7 +60,9 @@ dotnet build ChefHero.slnx
    npm --prefix src/ChefHero.Web run dev
    ```
 
-The front end runs at `http://localhost:5114`; the API runs at `http://localhost:5251`. In Development, OpenAPI and Scalar are available from the API at `/openapi/v1.json` and `/scalar`. `dotnet watch` reloads the API and Blazor app on code changes; Tailwind rebuilds its stylesheet when Razor or CSS sources change. Press Ctrl+C to stop all three processes.
+The front end runs at `https://localhost:7151`; the API runs at `http://localhost:5251`. In Development, OpenAPI and Scalar are available from the API at `/openapi/v1.json` and `/scalar`. `dotnet watch` reloads the API and Blazor app on code changes; Tailwind rebuilds its stylesheet when Razor or CSS sources change. Press Ctrl+C to stop all three processes.
+
+The web app uses a secure, HttpOnly authentication cookie containing an opaque session ID. Its PostgreSQL session table stores the API access token encrypted with ASP.NET Core Data Protection. The `src/ChefHero.Web/App_Data/DataProtectionKeys` directory is ignored by Git and must be persisted securely between restarts; multi-instance deployments must share a protected key ring. Outside Development, configure `DataProtection:CertificatePath` and `DataProtection:CertificatePassword` to a deployment-managed PKCS#12 certificate with its private key. Store the password in a secret manager and restrict file access to the web-app identity. The API currently issues a one-hour access token and does not provide refresh tokens, so users must sign in again when it expires.
 
 The front end is organized using atomic-design layers: `Components/Atoms`, `Components/Molecules`, and `Components/Organisms/Showcases`. `Pages` compose the domain-specific showcase components; the home page uses `MenuShowcase`, which renders reusable `MenuCard` components and a ShadcnBlazor `Button`.
 
